@@ -40,10 +40,18 @@ To add the transcripts to the database run:
 python add-to-db.py <transcript_file>
 ```
 
-This will create the table if it doesn't exist and insert the conversation into the database.
+This will create the table if it doesn't exist and insert the conversations into the database. Transcript entries further than 45 seconds apart are considered "new" conversations and marked as such in the database. Once processed the transcript file will be moved to ./transcripts/&lt;filename&gt;.**processed**.vtt.
 
 If processing transcripts from a past date, you can use the `-d <YYYY-MM-DD>` flag to specify the date of the conversation.
 
 ```bash
 python add-to-db.py <transcript_file> -d <YYYY-MM-DD>
+```
+
+### Bulk Adding Transcripts to Database
+
+If you have multiple transcripts to process for a single day you can use the "./bulk-add-to-db.sh" script. This script will process all transcripts in the ./transcripts directory for a given date.
+
+```bash
+./bulk-add-to-db.sh <YYYY-MM-DD>
 ```
