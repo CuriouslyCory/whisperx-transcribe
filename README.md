@@ -7,9 +7,12 @@ The heavy lifting is done with [whisperX](https://github.com/m-bain/whisperX).
 ## Setup
 
 To use this you'll need to first install [whisperx](https://github.com/m-bain/whisperX?tab=readme-ov-file#setup-%EF%B8%8F)
-If you want your transcripts to be stored in a database copy the `.env.example` file to `.env` and fill in the appropriate values.
 
-````bash
+If you want your transcripts to be stored in a database copy the `.env.example` file to `.env` and fill in the appropriate values. Then install the additional python requirements in the same python environment as whisperX (usually `whisperx`):
+
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -17,7 +20,7 @@ If not already active, activate your conda environment:
 
 ```bash
 conda activate whisperx
-````
+```
 
 ### Transcribing Audio
 
