@@ -4,6 +4,7 @@ from datetime import datetime, date
 import argparse
 from dotenv import load_dotenv
 import os
+import uuid
 
 load_dotenv()
 
@@ -27,6 +28,7 @@ cur.execute(
     """
 CREATE TABLE IF NOT EXISTS transcripts (
     id SERIAL PRIMARY KEY,
+    session_id UUID,
     speaker VARCHAR(255),
     date DATE,
     start_time TIME,
@@ -57,8 +59,18 @@ parser.add_argument(
     help="Date for the records in YYYY-MM-DD format",
     default=date.today().strftime("%Y-%m-%d"),
 )
+parser.add_argument(
+    "-s",
+    "--session_id",
+    type=str,
+    help="Session ID for the records",
+    default=None,
+)
 
 args = parser.parse_args()
+
+# Generate a unique session_id for this run
+session_id = args.session_id or str(uuid.uuid4())
 
 # Read and parse the VTT file
 for caption in WebVTT().read(args.vtt_file):
@@ -79,8 +91,8 @@ for caption in WebVTT().read(args.vtt_file):
 
     # Insert data into the table
     cur.execute(
-        """INSERT INTO transcripts (speaker, date, start_time, end_time, duration, content) VALUES (%s, %s, %s, %s, %s, %s)""",
-        (speaker, args.date, start_time, end_time, duration, content),
+        """INSERT INTO transcripts (session_id, speaker, date, start_time, end_time, duration, content) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+        (session_id, speaker, args.date, start_time, end_time, duration, content),
     )
 
 conn.commit()

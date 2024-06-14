@@ -27,7 +27,7 @@ conda activate whisperx
 Drop your audio files into the root of the project and then run the script:
 
 ```bash
-./transcribe.sh <audio_file>
+./ts.sh <audio_file>
 ```
 
 This will transcribe the audio file with speaker diarization. The transcripts will be inserted into ./transcripts/<today's date>_<index>.vtt. The audio file will be moved to ./audio/<today's date>_<index>.<ext>.
@@ -37,7 +37,7 @@ This will transcribe the audio file with speaker diarization. The transcripts wi
 To add the transcripts to the database run:
 
 ```bash
-python process.py <transcript_file>
+python add-to-db.py <transcript_file>
 ```
 
 This will create the table if it doesn't exist and insert the conversation into the database.
@@ -45,5 +45,5 @@ This will create the table if it doesn't exist and insert the conversation into 
 If processing transcripts from a past date, you can use the `-d <YYYY-MM-DD>` flag to specify the date of the conversation.
 
 ```bash
-python process.py <transcript_file> -d <YYYY-MM-DD>
+python add-to-db.py <transcript_file> -d <YYYY-MM-DD>
 ```
