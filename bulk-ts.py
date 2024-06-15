@@ -1,12 +1,13 @@
 import os
 import glob
+import subprocess
 
 
 def main():
     print("Beginning transcription")
 
     # Define the directory and pattern for matching files
-    directory = "./transcriptions"
+    directory = "."
     extensions = [
         "3gp",
         "aac",
@@ -48,7 +49,7 @@ def main():
         "swf",
         "ts",
         "vob",
-        "wav",
+        "WAV",
         "webm",
         "wma",
         "wmv",
@@ -61,7 +62,9 @@ def main():
         pattern = os.path.join(directory, f"*.{ext}")
         for file in glob.glob(pattern, recursive=False):
             # Output the command for each matching file
-            print(f"./transcribe.sh {file}")
+            print("Transcribing file:", file)
+            command = f"./ts.sh {file}"
+            subprocess.run(command, shell=True)
 
 
 if __name__ == "__main__":

@@ -136,7 +136,7 @@ filename.insert(-1, "inserted")
 new_filename = ".".join(filename)
 os.rename(args.vtt_file, new_filename)
 # Move the file to the ./transcripts/inserted directory
-new_directory = "./transcripts/inserted"
-shutil.move(new_filename, f"{new_directory}/{new_filename}")
+new_directory = "./transcriptions/inserted"
+shutil.move(new_filename, os.path.join(new_directory, new_filename))
 print(f"Processed VTT file: {args.vtt_file}")
 print(f"Session ID: {args.session_id}")
