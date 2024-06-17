@@ -29,57 +29,57 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-# Create the table if it does not exist
-cur.execute(
-    """-- Table: public.frontend-gui_transcripts
+# # Create the table if it does not exist
+# cur.execute(
+#     """-- Table: public.frontend-gui_transcripts
 
--- DROP TABLE IF EXISTS public."frontend-gui_transcripts";
+# -- DROP TABLE IF EXISTS public."frontend-gui_transcripts";
 
-CREATE TABLE IF NOT EXISTS public."frontend-gui_transcripts"
-(
-    id integer NOT NULL DEFAULT nextval('"frontend-gui_transcripts_id_seq"'::regclass),
-    session_id uuid NOT NULL,
-    conversation integer NOT NULL,
-    speaker character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    date date NOT NULL,
-    start_time time without time zone NOT NULL,
-    end_time time without time zone NOT NULL,
-    duration interval NOT NULL,
-    content text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT "frontend-gui_transcripts_pkey" PRIMARY KEY (id)
-)
+# CREATE TABLE IF NOT EXISTS public."frontend-gui_transcripts"
+# (
+#     id integer NOT NULL DEFAULT nextval('"frontend-gui_transcripts_id_seq"'::regclass),
+#     session_id uuid NOT NULL,
+#     conversation integer NOT NULL,
+#     speaker character varying(255) COLLATE pg_catalog."default" NOT NULL,
+#     date date NOT NULL,
+#     start_time time without time zone NOT NULL,
+#     end_time time without time zone NOT NULL,
+#     duration interval NOT NULL,
+#     content text COLLATE pg_catalog."default" NOT NULL,
+#     CONSTRAINT "frontend-gui_transcripts_pkey" PRIMARY KEY (id)
+# )
 
-TABLESPACE pg_default;
+# TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public."frontend-gui_transcripts"
-    OWNER to "lifeTranscriptsAdmin";
--- Index: conversation_idx
+# ALTER TABLE IF EXISTS public."frontend-gui_transcripts"
+#     OWNER to "lifeTranscriptsAdmin";
+# -- Index: conversation_idx
 
--- DROP INDEX IF EXISTS public.conversation_idx;
+# -- DROP INDEX IF EXISTS public.conversation_idx;
 
-CREATE INDEX IF NOT EXISTS conversation_idx
-    ON public."frontend-gui_transcripts" USING btree
-    (conversation ASC NULLS LAST)
-    TABLESPACE pg_default;
--- Index: session_id_idx
+# CREATE INDEX IF NOT EXISTS conversation_idx
+#     ON public."frontend-gui_transcripts" USING btree
+#     (conversation ASC NULLS LAST)
+#     TABLESPACE pg_default;
+# -- Index: session_id_idx
 
--- DROP INDEX IF EXISTS public.session_id_idx;
+# -- DROP INDEX IF EXISTS public.session_id_idx;
 
-CREATE INDEX IF NOT EXISTS session_id_idx
-    ON public."frontend-gui_transcripts" USING btree
-    (session_id ASC NULLS LAST)
-    TABLESPACE pg_default;
--- Index: speaker_idx
+# CREATE INDEX IF NOT EXISTS session_id_idx
+#     ON public."frontend-gui_transcripts" USING btree
+#     (session_id ASC NULLS LAST)
+#     TABLESPACE pg_default;
+# -- Index: speaker_idx
 
--- DROP INDEX IF EXISTS public.speaker_idx;
+# -- DROP INDEX IF EXISTS public.speaker_idx;
 
-CREATE INDEX IF NOT EXISTS speaker_idx
-    ON public."frontend-gui_transcripts" USING btree
-    (speaker COLLATE pg_catalog."default" ASC NULLS LAST)
-    TABLESPACE pg_default;
-"""
-)
-conn.commit()
+# CREATE INDEX IF NOT EXISTS speaker_idx
+#     ON public."frontend-gui_transcripts" USING btree
+#     (speaker COLLATE pg_catalog."default" ASC NULLS LAST)
+#     TABLESPACE pg_default;
+# """
+# )
+# conn.commit()
 
 
 # Function to parse VTT time format to Python time
@@ -145,7 +145,10 @@ for caption in WebVTT().read(args.vtt_file):
 
     # Insert data into the table
     cur.execute(
-        """INSERT INTO frontend-gui_transcripts (session_id, conversation, speaker, date, start_time, end_time, duration, content) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+        """INSERT INTO
+        public."frontend-gui_transcripts" (session_id, conversation, speaker, date, start_time, end_time, duration, content)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """,
         (
             args.session_id,
             conversation,
