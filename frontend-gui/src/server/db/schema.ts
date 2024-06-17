@@ -44,21 +44,6 @@ export const transcripts = createTable(
   }),
 );
 
-export const conversations = createTable(
-  "conversations",
-  {
-    id: serial("id").primaryKey(),
-    sessionId: uuid("session_id").notNull(),
-    conversation: integer("conversation").notNull(),
-    reviewed: boolean("reviewed").notNull().default(false),
-    speakers: text("speakers").notNull(),
-  },
-  (example) => ({
-    sessionIdIndex: index("conv_session_id_idx").on(example.sessionId),
-    conversationIndex: index("conv_conversation_idx").on(example.conversation),
-  }),
-);
-
 export const users = createTable("user", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),
   name: varchar("name", { length: 255 }),

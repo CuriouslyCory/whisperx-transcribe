@@ -19,7 +19,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 # Various other constants
 NEW_CONVERSATION_THRESHOLD = (
-    45  # How many seconds should pass before a conversation is considered "new"
+    60  # How many seconds should pass before a conversation is considered "new"
 )
 
 # Connect to the PostgreSQL database

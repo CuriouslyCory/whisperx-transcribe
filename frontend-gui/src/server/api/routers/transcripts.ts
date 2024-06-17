@@ -1,11 +1,7 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { transcripts } from "~/server/db/schema";
 
 export const transcriptsRouter = createTRPCRouter({
@@ -27,9 +23,13 @@ export const transcriptsRouter = createTRPCRouter({
   }),
 
   getAllConversations: publicProcedure.query(async ({ ctx }) => {
-    const conversations = await ctx.db.query.conversations.findMany({
-      orderBy: (conversations, { asc }) => [asc(conversations.id)],
-    });
+    const conversations = await ctx.db
+      .select({
+        sessionId: transcripts.sessionId,
+        conversation: transcripts.conversation,
+      })
+      .from(transcripts)
+      .groupBy(sql`"sessionId", "conversation"`);
     return conversations;
   }),
 
@@ -46,18 +46,24 @@ export const transcriptsRouter = createTRPCRouter({
   getByIndex: publicProcedure
     .input(z.object({ id: z.number().min(1) }))
     .query(async ({ input, ctx }) => {
-      const conversation = await ctx.db.query.conversations.findFirst({
-        where: and(eq(transcripts.id, input.id)),
-      });
+      const conversation = await ctx.db
+        .select({
+          sessionId: transcripts.sessionId,
+          conversation: transcripts.conversation,
+        })
+        .from(transcripts)
+        .groupBy(sql`${transcripts.sessionId}, ${transcripts.conversation}`)
+        .limit(1)
+        .offset(input.id);
 
-      if (!conversation) {
+      if (!conversation[0]) {
         return null;
       }
 
       const records = await ctx.db.query.transcripts.findMany({
         where: and(
-          eq(transcripts.sessionId, conversation.sessionId),
-          eq(transcripts.conversation, conversation.conversation),
+          eq(transcripts.sessionId, conversation[0].sessionId),
+          eq(transcripts.conversation, conversation[0].conversation),
         ),
         orderBy: (transcripts, { asc }) => [asc(transcripts.startTime)],
       });

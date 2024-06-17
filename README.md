@@ -20,7 +20,8 @@ There is a gui to help browse and clean up the transcripts. To install cd into t
 
 ```bash
 npm install
-
+# ensure your db connection string is in ./frontend-gui/.env
+npm run db:push
 npm run dev
 ```
 
