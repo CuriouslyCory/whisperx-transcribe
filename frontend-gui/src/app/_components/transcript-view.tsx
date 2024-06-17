@@ -63,7 +63,6 @@ export function TranscriptView({ transcript }: TranscriptViewProps) {
           <FormField
             control={form.control}
             name="sessionId"
-            disabled
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Session ID</FormLabel>

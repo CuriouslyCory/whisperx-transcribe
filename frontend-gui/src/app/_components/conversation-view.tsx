@@ -19,6 +19,10 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { Settings } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { cn } from "~/lib/utils";
 
 const SpeakerUpdateSchema = z.object({
   currentSpeakerName: z.string().max(255),
@@ -33,6 +37,7 @@ type ConversationViewProps = {
 
 export function ConversationView({ transcripts }: ConversationViewProps) {
   const router = useRouter();
+  const [selected, setSelected] = useState<number[]>([]);
   const form = useForm<z.infer<typeof SpeakerUpdateSchema>>({
     resolver: zodResolver(SpeakerUpdateSchema),
     defaultValues: {
@@ -40,6 +45,17 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
       currentSpeakerName: transcripts[0]?.speaker,
       sessionId: transcripts[0]?.sessionId,
       conversation: transcripts[0]?.conversation,
+    },
+  });
+
+  const deleteTranscripts = api.transcripts.deleteByIds.useMutation({
+    onSuccess: () => {
+      router.refresh();
+      setSelected([]);
+      toast({
+        title: "Success",
+        description: "Records deleted successfully",
+      });
     },
   });
 
@@ -55,6 +71,10 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
 
   function onSubmit(data: Parameters<typeof updateSpeaker.mutate>[0]) {
     updateSpeaker.mutate(data);
+  }
+
+  function deleteSelected() {
+    deleteTranscripts.mutate(selected);
   }
 
   return (
@@ -138,9 +158,34 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
             </div>
           </div>
         )}
-        <div>
+        <div className="flex flex-col gap-y-2">
+          {selected.length > 0 && (
+            <div>
+              <Button onClick={deleteSelected}>Delete selected</Button>
+            </div>
+          )}
           {transcripts?.map((transcript) => (
-            <div key={transcript.id} className="flex gap-x-2">
+            <div key={transcript.id} className="flex items-center gap-x-2">
+              <div
+                onClick={() => {
+                  if (selected.includes(transcript.id)) {
+                    setSelected(selected.filter((id) => id !== transcript.id));
+                  } else {
+                    setSelected([...selected, transcript.id]);
+                  }
+                }}
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-full ",
+                  selected.includes(transcript.id)
+                    ? "bg-blue-300"
+                    : "bg-slate-300",
+                )}
+              >
+                {transcript.speaker.substring(0, 2)}
+              </div>
+              <Link href={`/transcript/${transcript.id}`}>
+                <Settings size={16} />
+              </Link>
               <h2
                 className="cursor-pointer hover:underline"
                 onClick={() =>

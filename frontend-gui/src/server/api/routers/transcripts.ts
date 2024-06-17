@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 import {
@@ -26,6 +26,23 @@ export const transcriptsRouter = createTRPCRouter({
     return records;
   }),
 
+  getAllConversations: publicProcedure.query(async ({ ctx }) => {
+    const conversations = await ctx.db.query.conversations.findMany({
+      orderBy: (conversations, { asc }) => [asc(conversations.id)],
+    });
+    return conversations;
+  }),
+
+  getById: publicProcedure
+    .input(z.object({ id: z.number().min(1) }))
+    .query(async ({ input, ctx }) => {
+      const records = await ctx.db.query.transcripts.findFirst({
+        where: and(eq(transcripts.id, input.id)),
+      });
+
+      return records;
+    }),
+
   getByIndex: publicProcedure
     .input(z.object({ id: z.number().min(1) }))
     .query(async ({ input, ctx }) => {
@@ -46,6 +63,35 @@ export const transcriptsRouter = createTRPCRouter({
       });
 
       return records;
+    }),
+
+  deleteConversation: publicProcedure
+    .input(
+      z.object({
+        sessionId: z.string().uuid(),
+        conversation: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { sessionId, conversation } = input;
+
+      return await ctx.db
+        .delete(transcripts)
+        .where(
+          and(
+            eq(transcripts.sessionId, sessionId),
+            eq(transcripts.conversation, conversation),
+          ),
+        );
+    }),
+
+  deleteByIds: publicProcedure
+    .input(z.array(z.number().min(1)))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db
+        .delete(transcripts)
+        .where(inArray(transcripts.id, input))
+        .returning();
     }),
 
   update: publicProcedure
