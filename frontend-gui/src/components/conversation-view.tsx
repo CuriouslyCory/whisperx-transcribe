@@ -252,7 +252,7 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
               >
                 [{transcript.speaker}]:
               </h2>
-              <span>{transcript.content}</span>
+              <span className="flex-1">{transcript.content}</span>
             </div>
           ))}
         </div>

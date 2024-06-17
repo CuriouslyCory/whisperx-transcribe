@@ -14,6 +14,16 @@ If you want your transcripts to be stored in a database copy the `.env.example` 
 pip install -r requirements.txt
 ```
 
+## Transcripts GUI
+
+There is a gui to help browse and clean up the transcripts. To install cd into the `frontend-gui` directory and run:
+
+```bash
+npm install
+
+npm run dev
+```
+
 ## Usage
 
 If not already active, activate your conda environment:
@@ -22,7 +32,17 @@ If not already active, activate your conda environment:
 conda activate whisperx
 ```
 
-### Transcribing Audio
+Add your audio files to the root of the project. Then run:
+
+```bash
+./run-all.sh
+```
+
+This runs `python bulk-ts.py` to create transcriptions for all audio files in the root of the project. Then it runs `python bulk-add-to-db.py` to add all the transcripts to the database.
+
+See below for instructions on how to run each script individually.
+
+### Transcribing Audio (Audio file => Text transcript)
 
 Drop your audio files into the root of the project and then run the script:
 
@@ -30,7 +50,7 @@ Drop your audio files into the root of the project and then run the script:
 ./ts.sh <audio_file>
 ```
 
-This will transcribe the audio file with speaker diarization. The transcripts will be inserted into ./transcripts/<today's date>_<index>.vtt. The audio file will be moved to ./audio/<today's date>_<index>.<ext>.
+This will transcribe the audio file with speaker diarization. The transcripts will be inserted into ./transcripts/<today's date>_<index>.vtt. The audio file will be moved to ./processed-audio/<today's date>_<index>.<ext>.
 
 ### Adding Transcripts to Database
 
