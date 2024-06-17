@@ -120,7 +120,7 @@ export const transcriptsRouter = createTRPCRouter({
       return result[0];
     }),
 
-  updateSpeaker: publicProcedure
+  switchSpeakerName: publicProcedure
     .input(
       z.object({
         currentSpeakerName: z.string().max(255),
@@ -142,6 +142,22 @@ export const transcriptsRouter = createTRPCRouter({
             eq(transcripts.speaker, currentSpeakerName),
           ),
         )
+        .returning();
+      return result;
+    }),
+  updateSpeakerByIds: publicProcedure
+    .input(
+      z.object({
+        newSpeakerName: z.string().max(255),
+        transcriptIds: z.array(z.number().min(1)),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { newSpeakerName, transcriptIds } = input;
+      const result = await ctx.db
+        .update(transcripts)
+        .set({ speaker: newSpeakerName })
+        .where(and(inArray(transcripts.id, transcriptIds)))
         .returning();
       return result;
     }),

@@ -19,10 +19,11 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { Settings } from "lucide-react";
+import { Copy, Settings } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { cn } from "~/lib/utils";
+import { copyToClipboard } from "~/lib/clipboard";
 
 const SpeakerUpdateSchema = z.object({
   currentSpeakerName: z.string().max(255),
@@ -59,7 +60,7 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
     },
   });
 
-  const updateSpeaker = api.transcripts.updateSpeaker.useMutation({
+  const updateSpeaker = api.transcripts.switchSpeakerName.useMutation({
     onSuccess: () => {
       router.refresh();
       toast({
@@ -69,12 +70,42 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
     },
   });
 
+  const updateSpeakerByIds = api.transcripts.updateSpeakerByIds.useMutation({
+    onSuccess: () => {
+      router.refresh();
+      toast({
+        title: "Success",
+        description: "Speaker updated successfully",
+      });
+    },
+  });
+
+  function updateSpeakerOnSelectedRecords() {
+    updateSpeakerByIds.mutate({
+      newSpeakerName: form.getValues("newSpeakerName"),
+      transcriptIds: selected,
+    });
+  }
+
   function onSubmit(data: Parameters<typeof updateSpeaker.mutate>[0]) {
     updateSpeaker.mutate(data);
   }
 
   function deleteSelected() {
     deleteTranscripts.mutate(selected);
+  }
+
+  function copyConversation() {
+    copyToClipboard(
+      transcripts.map((t) => `${t.speaker}: ${t.content}`).join("\n"),
+    )
+      .then(() => {
+        toast({
+          title: "Success",
+          description: "Conversation copied to clipboard",
+        });
+      })
+      .catch((e) => console.error(e));
   }
 
   return (
@@ -89,10 +120,10 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
                 <span>SessionId: {transcripts[0]?.sessionId}</span>
                 <span>Conversation: {transcripts[0]?.conversation}</span>
               </div>
-              <div className="flex gap-x-2">
-                <div className="flex flex-col justify-center gap-y-2">
+              <div className="flex flex-col gap-x-2">
+                <div className="flex items-center gap-x-2">
                   <span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    Selected Speaker:
+                    Selected Speaker Name:
                   </span>
                   <span className="py-2">
                     {form.getValues("currentSpeakerName")}
@@ -104,7 +135,7 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
                   name="newSpeakerName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Set to...</FormLabel>
+                      <FormLabel>New Speaker Name</FormLabel>
                       <FormControl>
                         <Input placeholder="Speaker" {...field} />
                       </FormControl>
@@ -152,18 +183,43 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
                   )}
                 />
               </div>
-              <Button type="submit" disabled={updateSpeaker.isPending}>
-                {updateSpeaker.isPending ? "Submitting..." : "Submit"}
-              </Button>
+              <div className="mt-2 flex gap-x-2">
+                <Button type="submit" disabled={updateSpeaker.isPending}>
+                  {updateSpeaker.isPending
+                    ? "Submitting..."
+                    : "Selected Speaker Name to New Speaker Name"}
+                </Button>
+                {selected.length > 0 && (
+                  <Button
+                    type="button"
+                    onClick={updateSpeakerOnSelectedRecords}
+                    disabled={updateSpeakerByIds.isPending}
+                  >
+                    {updateSpeakerByIds.isPending
+                      ? "Submitting..."
+                      : "Update Selected Records"}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         )}
         <div className="flex flex-col gap-y-2">
-          {selected.length > 0 && (
-            <div>
-              <Button onClick={deleteSelected}>Delete selected</Button>
-            </div>
-          )}
+          <div className="flex items-center gap-x-2">
+            <Button onClick={copyConversation} type="button">
+              <Copy />
+            </Button>
+            {selected.length > 0 && (
+              <>
+                <Button onClick={deleteSelected} type="button">
+                  Delete selected
+                </Button>
+                <Button type="button" onClick={() => setSelected([])}>
+                  Clear Selection
+                </Button>
+              </>
+            )}
+          </div>
           {transcripts?.map((transcript) => (
             <div key={transcript.id} className="flex items-center gap-x-2">
               <div
