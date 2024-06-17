@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ConversationView } from "~/app/_components/conversation-view";
-import DeleteConversationButton from "~/app/_components/delete-conversation-button";
+import { ConversationView } from "~/components/conversation-view";
+import DeleteConversationButton from "~/components/delete-conversation-button";
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/server";
 

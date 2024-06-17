@@ -231,10 +231,10 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
                   }
                 }}
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full ",
+                  "flex h-8 w-8 items-center justify-center rounded-full",
                   selected.includes(transcript.id)
                     ? "bg-blue-300"
-                    : "bg-slate-300",
+                    : "bg-slate-300 dark:bg-slate-700",
                 )}
               >
                 {transcript.speaker.substring(0, 2)}

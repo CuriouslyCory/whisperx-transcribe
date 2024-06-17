@@ -1,4 +1,4 @@
-import { TranscriptView } from "~/app/_components/transcript-view";
+import { TranscriptView } from "~/components/transcript-view";
 import { api } from "~/trpc/server";
 
 export default async function Page({ params }: { params: { id: string } }) {
