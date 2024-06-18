@@ -39,6 +39,8 @@ type ConversationViewProps = {
 export function ConversationView({ transcripts }: ConversationViewProps) {
   const router = useRouter();
   const [selected, setSelected] = useState<number[]>([]);
+  const [lastSelected, setLastSelected] = useState<number | null>(null);
+
   const form = useForm<z.infer<typeof SpeakerUpdateSchema>>({
     resolver: zodResolver(SpeakerUpdateSchema),
     defaultValues: {
@@ -106,6 +108,32 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
         });
       })
       .catch((e) => console.error(e));
+  }
+
+  function clickRow(evt: React.MouseEvent<HTMLDivElement>, tsId: number) {
+    if (evt.shiftKey) {
+      if (!lastSelected) return;
+      const newSelected = [];
+
+      if (tsId < lastSelected) {
+        for (let i = tsId; i <= lastSelected; i++) {
+          newSelected.push(i);
+        }
+      } else if (tsId > lastSelected) {
+        for (let i = lastSelected; i <= tsId; i++) {
+          newSelected.push(i);
+        }
+      }
+
+      setSelected([...selected, ...newSelected]);
+    } else {
+      if (selected.includes(tsId)) {
+        setSelected(selected.filter((id) => id !== tsId));
+      } else {
+        setSelected([...selected, tsId]);
+      }
+    }
+    setLastSelected(tsId);
   }
 
   return (
@@ -223,13 +251,7 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
           {transcripts?.map((transcript) => (
             <div key={transcript.id} className="flex items-center gap-x-2">
               <div
-                onClick={() => {
-                  if (selected.includes(transcript.id)) {
-                    setSelected(selected.filter((id) => id !== transcript.id));
-                  } else {
-                    setSelected([...selected, transcript.id]);
-                  }
-                }}
+                onClick={(evt) => clickRow(evt, transcript.id)}
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-full",
                   selected.includes(transcript.id)
