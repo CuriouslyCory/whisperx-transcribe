@@ -233,7 +233,7 @@ export function ConversationView({ transcripts }: ConversationViewProps) {
           </div>
         )}
         <div className="flex flex-col gap-y-2">
-          <div className="flex items-center gap-x-2">
+          <div className="bg-background sticky top-0 flex items-center gap-x-2 py-2">
             <Button onClick={copyConversation} type="button">
               <Copy />
             </Button>

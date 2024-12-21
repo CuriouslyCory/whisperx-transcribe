@@ -1,3 +1,5 @@
 .env
 processed-audio
 transcriptions
+*.wav
+*.mp3

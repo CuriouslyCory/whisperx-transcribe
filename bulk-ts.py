@@ -50,6 +50,7 @@ def main():
         "ts",
         "vob",
         "WAV",
+        "wav",
         "webm",
         "wma",
         "wmv",
